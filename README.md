@@ -17,7 +17,7 @@ Lua based dataset analyzer tool
 
 3. *unpack api and samples*
 ~~~
-tar xvzf file.tar.gz
+git clone https://github.com/hipBali/lua-datatree.git
 ~~~
 4. *prepare the nginx.conf config file*
 You can use the configuration attached to the package, or just create a simple plain text file named  `conf/nginx.conf`  with the following contents in it:
