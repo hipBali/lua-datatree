@@ -12,14 +12,12 @@ Lua based dataset analyzer tool
 ~~~
     mkdir ~/work 
     cd ~/work 
+    git clone https://github.com/hipBali/lua-datatree.git
+    cd lua-datatree
     mkdir logs/ conf/ 
 ~~~
 
-3. *unpack api and samples*
-~~~
-git clone https://github.com/hipBali/lua-datatree.git
-~~~
-4. *prepare the nginx.conf config file*
+3. *prepare the nginx.conf config file*
 You can use the configuration attached to the package, or just create a simple plain text file named  `conf/nginx.conf`  with the following contents in it:
 ~~~
     worker_processes 1;
@@ -41,7 +39,7 @@ You can use the configuration attached to the package, or just create a simple p
       }
     }
 ~~~
- 5. *run Nginx rest service*
+ 4. *run Nginx rest service*
 ~~~
 nginx -p `pwd`/ -c conf/nginx.conf
 ~~~
