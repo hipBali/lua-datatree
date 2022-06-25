@@ -1,5 +1,6 @@
 
 
+
 # lua-datatree-redis
 
 Lua based dataset analyzer tool using redis storage
@@ -498,7 +499,80 @@ ds:select{object="CUSTOMERS", filter=
       return c.first_name:find("Johna") 
    end} 
 ~~~
+### limit result size
+~~~
+ds:select{object="CUSTOMERS", filter={first_name="Garry"}, limit=1}
+~~~
+### select some fields of records
+~~~
+ds:select{object="CUSTOMERS", fields= {"customer_id", "last_name", "first_name"}}
+~~~
+### add calculated fields to select
+This example adds a new field 'name' to the record and removes unneccesary ones assigning its values to nil. The function must be return a lua table containing the new record values.
+~~~
+ds:select{object="CUSTOMERS", fields= {"customer_id", "last_name", "first_name"}, call=
+	function(c)
+		c.name = string.format("%s, %s", c.last_name, c.first_name)
+		c.last_name = nil 
+		c.first_name = nil
+		return c
+	end}
+~~~
 
+### sort/order result with comparator
+~~~
+ds:select{object="CUSTOMERS", fields= {"customer_id", "last_name"}
+:sort{ 
+   function(a,b)
+     return a.last_name< b.last_name 
+   end} 
+~~~
+
+### join related table
+~~~
+ds:select{object="PRODUCTS", limit=1} 		
+:join{object="BRANDS"} 
+~~~
+the result data structure should be like
+~~~
+{"brand_id":9,
+"product_name":"Trek 820 - 2016",
+"list_price":379.99,
+"product_id":1,
+"category_id":6,
+"model_year":2016,
+"BRANDS":[
+  {
+    "brand_name":"Trek",
+    "brand_id":9
+  }]
+}
+~~~
+### join and merge
+~~~
+ds:select{object="PRODUCTS", limit=1} 		
+:join{object="BRANDS", merge=true} 
+~~~
+Table PRODUCTS and BRANDS 1:1 related via brand_id and in this case the result will merged to one dimensioned array using the merge=true parameter.
+~~~
+{
+"brand_id":9,
+"brand_name":"Trek",
+"product_name":"Trek 820 - 2016",
+"list_price":379.99,
+"product_id":1,
+"category_id":6,
+"model_year":2016
+}
+~~~
+
+### change join target
+The join method tries to join to the last node of the dataset chain. With the 'on' parameter you can change the default target node to another one.   
+~~~
+ds:select{object="PRODUCTS"}	
+:join{object="BRANDS", merge=true}
+:join{object="CATEGORIES", on="PRODUCTS", merge=true}
+~~~
 
 ## License
 
