@@ -82,15 +82,15 @@ dtree-redis
 1. *install openresty*
 2. *create your own workspace and install lua-datatree-redis*
 ~~~
-    mkdir ~/work 
-    cd ~/work 
-	git clone https://github.com/hipBali/lua-datatree-redis.git
-	cd dtree-redis
-	cp src/* resty/api/core
+   mkdir ~/work 
+   cd ~/work 
+   git clone https://github.com/hipBali/lua-datatree-redis.git
+   cd dtree-redis
+   cp src/* resty/api/core
 ~~~
  3. *run Nginx rest service*
 ~~~
-	nginx -p `pwd`/ -c conf/nginx.conf
+   nginx -p `pwd`/ -c conf/nginx.conf
 ~~~
 
 ***simple curl request***
@@ -107,24 +107,24 @@ localhost:8080/test/filter
 ### using command line interface
 1. *create your own workspace and install lua-datatree-redis*
 ~~~
-	mkdir ~/work 
-    cd ~/work 
-	git clone https://github.com/hipBali/lua-datatree-redis.git
-	cd dtree-redis
-	cp src/* cli/api/core
+   mkdir ~/work 
+   cd ~/work 
+   git clone https://github.com/hipBali/lua-datatree-redis.git
+   cd dtree-redis
+   cp src/* cli/api/core
 ~~~
 
 2. *create your own workspace*
 ~~~
-    cd ~/work/dtree-redis/cli 
-	mkdir ~/mytest
-    cd ~/mytest 
+   cd ~/work/dtree-redis/cli 
+   mkdir ~/mytest
+   cd ~/mytest 
 ~~~
  3. *put your scripts in to the workspace considering the **package.path** variable*
 ~~~
-	package.path = "../?.lua;" .. package.path
-	local redc = require "api.core.redis_client_cli"
-	...
+package.path = "../?.lua;" .. package.path
+local redc = require "api.core.redis_client_cli"
+...
 ~~~
 
 ## Preparing data for Redis <a name="prep_redis"></a>
