@@ -2,7 +2,26 @@
 # lua-datatree-redis
 __Lua based dataset analyzer tool using redis storage__
 
-## Requirements
+
+# Table of Contents
+[Requirements](#req)
+
+[Directory structure](#dir_struct)
+
+[Api documentation](#api_doc)
+
+[Usage](#usage)
+
+[Preparing data for Redis](#prep_redis)
+
+[Redis Datatree structure](#red_struct)
+
+[How-to](#howto)
+
+
+
+## Requirements  <a name="req"></a>
+
 >**Redis**
 >[redis.io](https://redis.io)
 
@@ -15,11 +34,13 @@ for use from command line
 >[nrk/redis-lua](https://github.com/nrk/redis-lua)
 >
 
-## Directory structure
+## Directory structure <a name="dir_struct"></a>
 ~~~
 dtree-redis
 ├── cli
 │   └── test
+|		├── tables.lua
+│       └── sum.lua
 ├── readme.md
 ├── resty
 │   ├── api
@@ -47,12 +68,12 @@ dtree-redis
 │   └── redis_client_cli.lua
 └── to-redis
     ├── bikestore_loader.lua
-    ├── bikestore_data
+    ├── data
     │   ├── # bikestore example files (json)
     └── toredis.lua
 ~~~
 
-## Usage
+## Usage <a name="usage"></a>
 ### using as rest service
 1. *install openresty*
 2. *create your own workspace*
@@ -78,7 +99,8 @@ $ curl -X POST -H "Content-Type: application/json" \
 -d '{"customer_id":123, "staff_id":1}' \
 localhost:8080/test/filter
 ~~~
-## Preparing data for Redis
+## Preparing data for Redis <a name="prep_redis"></a>
+
 ### Creating dataset from json files
 **create dataloader**
 		The dataloader should define detailed structure of the json file(s).
@@ -132,7 +154,42 @@ save  your script e.g. myloader.lua and run...
 ...
 ~~~
 
-## Api documentation
+## Redis Datatree structure <a name="red_struct"></a>
+
+### Descriptors
+***base***
+format : JSON
+access: GET/SET
+key: -
+~~~
+{TABLE_NAME: RECORD_COUNT}
+~~~
+
+***desc***
+format : JSON
+access: GET/SET
+key: -
+~~~
+{TABLE_NAME:{
+	"index":[
+		{"name":INDEX_NAME,
+		 "segments":[FIELD_NAME(S)]
+		}
+	]}
+}	
+~~~ 
+
+***record***
+format : JSON
+access: GET/SET
+key: TABLE_NAME:ROWID	
+
+***index***
+format : table of integers
+access: SADD/SMEMBERS
+key: TABLE_NAME:INDEX_NAME:INDEX_ROWID
+
+## Api documentation <a name="req"></a>
 
 ***DataTree class***
 
@@ -259,18 +316,18 @@ Same as ___join___ method, but the result will be automatically converted to ___
 ---
 The datatree object contains raw data including some non relevant informatons beyond what is expected. The following methods will cleanup the result.
 **content( )**
-Returns datatree content as lua table
+Returns datatree content as simple lua table
 **toCollection( )**  or **tc( )**
 Returns  datatree content as ___collection class___.  
 
 ---
 
 ***Collection class***
-Datacollection is the cleaned version of the datatree, with some helper function for further manipulation of the result set.
+DataCollection is the 'pure data only' part of the DataTree.
 
 *creating data collection*
 ~~~
-local dtc = require "api.core.dbtcoll"
+local dtc = require "api.core.dtcoll"
 ...
 local function fn_stock_calc(stocks)
 	local sColl = dtc.new(stocks)
@@ -312,13 +369,14 @@ the result should looks like this
 **each( function )** and **eachi( function )**
 iterator function for the collection
 
+the
 **max( key )**
 **min( key )**
 **sum( key )**
 **avg( key )**
 **count( )**
 **median( key )**
-aggregate functions
+are aggregate functions
 
 **range( vMin, vMax, key )**
 returns a part of the collection in given range
@@ -332,8 +390,46 @@ returns a part of the collection which are out of the set of values
 **clone( )**
 makes a new individual object from the original 
 
-*examples*:
+---
+
+## How-to <a name="howto"></a>
+
+### Prepare your query
+
+***cli***
+~~~
+local redc = require "api.core.redis_client_cli"
+local dt_red = require "api.core.dtree_redis"
+local json= require "api.core.json"
+
+local red = redc.connect()
+local dt = dt_red.new('MY_DB_NAME',red)
+
+local result = dt:select{ ... }
+local serializable_datatree
+
+-- result as collection
+serializable_datatree = result:tc()
+-- result as lua table
+serializable_datatree = result:content()
+
+print(json.encode( serializable_datatree ))
 ~~~
 
+***resty***
 ~~~
----
+local redc = require "api.core.redis_client"
+local dt_red = require "api.core.dtree_redis"
+
+local red = redc.connect()
+local dt = dt_red.new('MY_DB_NAME',red)
+
+requestHandler = function()
+	local red = redc.connect()
+	local dt = dt_red.new('MY_DB_NAME',red)
+	local ds = dt:select{ ... }:content()
+	return { error=0, result = ds }
+end 
+~~~
+
+### Preapre your query
