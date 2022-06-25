@@ -483,11 +483,19 @@ requestHandler = function(par)
 ~~~
 
 ## Programming by examples <a name="prog"></a>
-based on ***bikestore*** database
 
+example database based on ***bikestore*** database
 ![Bikestore database](to-redis/bikestore_data/SQL-Server-Sample-Database.png)
 
-### select 
+### select a customer by a filter
+~~~
+ds:select{object="CUSTOMERS", filter={customer_id=66}}
+~~~
+### select a customer by special filter function
+~~~
+ds:select{object="CUSTOMERS", filter=function(c) return c.first_name:find("Johna") end} 
+~~~
+
 
 ## License
 
