@@ -1,69 +1,85 @@
-# lua-datatree
-Lua based dataset analyzer tool
+
+# lua-datatree-redis
+__Lua based dataset analyzer tool using redis storage__
 
 ## Requirements
+>**Redis**
+>[redis.io](https://redis.io)
+
+for use as rest service
 >**OpenResty**
 >[openresty.org](https://openresty.org/)
 
-## Installation
+for use from command line
+>**redis-lua**
+>[nrk/redis-lua](https://github.com/nrk/redis-lua)
+>
 
+## Directory structure
+~~~
+dtree-redis
+├── cli
+│   └── test
+├── readme.md
+├── resty
+│   ├── api
+│   │   └── core
+│   │       └── __copy_src__content_here__
+│   ├── conf
+│   │   └── nginx.conf
+│   ├── logs
+│   ├── rest.lua
+│   └── scripts
+│       └── test
+│           ├── custorders.lua
+│           ├── filter.lua
+│           ├── report.lua
+│           ├── sort.lua
+│           └── sum.lua
+├── src
+│   ├── dtcoll.lua
+│   ├── dtcommon.lua
+│   ├── dtree_redis.lua
+│   ├── dtutil_redis.lua
+│   ├── hlpfunc.lua
+│   ├── json.lua
+│   ├── redis_client.lua
+│   └── redis_client_cli.lua
+└── to-redis
+    ├── bikestore_loader.lua
+    ├── data
+    │   ├── # bikestore example files (json)
+    └── toredis.lua
+~~~
+
+## Usage
+### using as rest service
 1. *install openresty*
 2. *create your own workspace*
 ~~~
     mkdir ~/work 
     cd ~/work 
-    git clone https://github.com/hipBali/lua-datatree.git
-    cd lua-datatree
-    mkdir logs/ conf/ 
+	git clone https://github.com/hipBali/lua-datatree-redis.git
+	cd dtree-redis
+	cp src/* resty/api/core
+~~~
+ 3. *run Nginx rest service*
+~~~
+	nginx -p `pwd`/ -c conf/nginx.conf
 ~~~
 
-3. *prepare the nginx.conf config file*
-You can use the configuration attached to the package, or just create a simple plain text file named  `conf/nginx.conf`  with the following contents in it:
-~~~
-    worker_processes 1;
-    events {
-      worker_connections 8;
-    }
-    http {
-      access_log /dev/stdout;
-      error_log /dev/stderr; 
-      server {
-        listen 8080;
-        server_name localhost;
-        charset utf-8;
-        charset_types application/json;
-        default_type application/json;
-        location / {
-          content_by_lua_file api/rest.lua;
-        }
-      }
-    }
-~~~
- 4. *run Nginx rest service*
-~~~
-nginx -p `pwd`/ -c conf/nginx.conf
-~~~
-
-## Usage
 ### using curl without parameters
 ~~~
-$ curl localhost:8080/bikestore/sum
-127.0.0.1 - - [22/Jun/2022:10:48:40 +0200] "GET /bikestore/sum HTTP/1.1" 200 98 "-" "curl/7.68.0"
-{"result":[{"product_id":1,"product_name":"Trek 820 - 2016","on_stock":55}],"error":0}
+$ curl localhost:8080/test/sum
 ~~~
 ### using curl with parameters
 ~~~
 $ curl -X POST -H "Content-Type: application/json" \
 -d '{"customer_id":123, "staff_id":1}' \
-localhost:8080/bikestore/filter
-127.0.0.1 - - [22/Jun/2022:10:52:11 +0200] "POST /bikestore/filter HTTP/1.1" 200 360 "-" "curl/7.68.0"
-{"result":[
-{"order_date":"2003-01-25","order_id":3258,"order_status":4,"shipped_date":"2003-01-27","store_id":1,"required_date":"2003-01-28","customer_id":123,"staff_id":1},
-{"order_date":"2007-01-04","order_id":10616,"order_status":4,"shipped_date":"2007-01-07","store_id":1,"required_date":"2007-01-09","customer_id":123,"staff_id":1}
-],"error":0}
+localhost:8080/test/filter
 ~~~
-## How-to
-
+## Preparing data for Redis
+### Creating dataset from json files
 **create dataloader**
 		The dataloader should define detailed structure of the json file(s).
 		
@@ -71,34 +87,35 @@ localhost:8080/bikestore/filter
 local dataPath = "mydata/bikestore/"
 
 local db_model = {
-	{ name = "CUSTOMERS", 
+  { name = "CUSTOMERS", 
 	filename = dataPath.."customers.json", 
-	index = {{ name = "pk", segments = {"customer_id"} }},
+	index = {
+	  { name = "pk", segments = {"customer_id"} },
+	  { name = "idx_name", segments = {"last_name", "last_name"}, unique = false },
+		...
 	},
-	...
+  },
+  ...
 }
 ~~~
-
-publish an entry point to the loader
-		
+use toredis.lua utility to put dataset to Redis
 ~~~
-local dbt = require"api.core.dbtree"
-local dbu = require "api.core.dbutil"
-
-local m = {}
-
-function m.getDbt()
-	return dbt.new("BIKESTORE",dbu.loadModel(db_model,"rows"))
-end
-
-return m
+local db_model = {
+	...
+}
+local ldr = require "toredis"
+ldr(db_model)
 ~~~
+save  your script e.g. myloader.lua and run...
+~~~
+	$ lua myloader.lua
+~~~
+
 		
-*Loading dataset from different json format*
-						dbu.loadModel(dataset_descriptor,**path_to_dataset**)
+**Loading dataset from different json structure**
+						r_loadModel(dataset_descriptor,**path_to_dataset**)
 		
 *this loader tries to find records at the 'rows' node, so you can change the path with changing this parameter*
-
 ~~~
 {
 "table": "products",
@@ -115,56 +132,8 @@ return m
 ...
 ~~~
 
-**initialize and load dataset at service startup**
-Add loader script with an 'init_by_lua_block' command to ___nginx.conf___ file,
-~~~
-http {
+### Creating dataset from database tables
 
-  access_log /dev/stdout;
-  error_log /dev/stderr;
-  
-  # this runs before forking out nginx worker processes:
-  init_by_lua_block { 
-	local dbtloader = require "bikestore.data.dataloader"
-	local pool = require "api.core.dbpool"
-	local db = dbtloader.getDbt()
-	pool.set("bikestore",db)
-  }
-  
-  server {
-    listen 8080;
-    server_name localhost;
-	...
-
-~~~
-or create your own data loader script and execute it anytime
-~~~
-local dbtloader = require "bikestore.data.dataloader_big"
-local pool = require "api.core.dbpool"
-
-requestHandler = function()
-	-- remove previous version
-	pool.set("bikestore",nil)
-	collectgarbage("collect")
-	-- load new version
-	local db = dbtloader.getDbt()
-	pool.set("bikestore",db)
-	local _,desc = db:getInfo()
-	return{desc}
-end 
-~~~
-
-**prepare your query**
-~~~
-local pool = require "api.core.dbpool"
-
-requestHandler = function()
-	local dataSet = pool.get("bikestore")
-	local script= dataSet: ...
-	...
-	return { error=0, result = script:content() }
-end 
-~~~
 
 ## Api documentation
 
