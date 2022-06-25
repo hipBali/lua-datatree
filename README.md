@@ -485,12 +485,11 @@ requestHandler = function(par)
 ## Programming by examples <a name="prog"></a>
 based on ***bikestore*** database
 
-![Tux, the Linux mascot](/assets/images/tux.png)
+![Bikestore database](to-redis/data/SQL-Server-Sample-Database.png)
 
-![enter image description here](https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png)
 ### select 
 
-### License
+## License
 
 
 BSD 2-Clause License
