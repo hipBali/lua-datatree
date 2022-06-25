@@ -1,0 +1,19 @@
+-- datatree-redis 
+
+data_tree
+	'base'
+		tablename = size
+		...
+	'desc' 
+		tablename = descriptor as json
+		...
+	tablename:id 
+		key_value_pairs
+		...
+	tablename:index_name
+		size
+		id 
+			ref_id
+			...
+		...
+	
