@@ -1,4 +1,5 @@
 
+
 # lua-datatree-redis
 
 Lua based dataset analyzer tool using redis storage
@@ -340,10 +341,10 @@ ds:select{object="ORDERS", fields={"order_id","customer_id","order_date"}}
 ~~~
 
 **tc_select{ }**
-Same as ___select___ method, but the result will be automatically converted to ___collection___ class
+Same as ___select___ method, but the result will be automatically converted to ___collection___ class. This is the final result of the select ommand only DataCollection methods or lua table functions can be used for further manipulations!
 
 **tc_join{ }**
-Same as ___join___ method, but the result will be automatically converted to ___collection___ class
+Same as ___join___ method, but the result will be automatically converted to ___collection___ class. This is the final result of the select-join command chain only DataCollection methods or lua table functions can be used for further manipulations!
 
 ---
 The datatree object contains raw data including some non relevant informatons beyond what is expected. The following methods will cleanup the result.
@@ -481,19 +482,17 @@ requestHandler = function(par)
 	...
 ~~~
 
-### Get POST params
-curl command
+### License
 ~~~
-curl \
--X POST \
--H "Content-Type: application/json" \
--d '{"customer_id":123, "staff_id":1}' \
-...
-~~~
-lua script will get the parameters as lua table
-~~~
-requestHandler = function(par)
-	print(par.customer_id)
-	print(par.staff_id)
-	...
+BSD 2-Clause License
+Copyright (c) 2022, hipBali
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ~~~
