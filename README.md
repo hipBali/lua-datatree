@@ -72,9 +72,9 @@ dtree-redis
 │   ├── redis_client.lua
 │   └── redis_client_cli.lua
 └── to-redis
+    ├── bikestore_data
+    │   └── # bikestore example files (json)
     ├── bikestore_loader.lua
-    ├── data
-    │   ├── # bikestore example files (json)
     └── toredis.lua
 ~~~
 
