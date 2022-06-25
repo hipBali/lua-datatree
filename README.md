@@ -493,7 +493,10 @@ ds:select{object="CUSTOMERS", filter={customer_id=66}}
 ~~~
 ### select a customer by special filter function
 ~~~
-ds:select{object="CUSTOMERS", filter=function(c) return c.first_name:find("Johna") end} 
+ds:select{object="CUSTOMERS", filter=
+   function(c)
+      return c.first_name:find("Johna") 
+   end} 
 ~~~
 
 
