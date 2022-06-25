@@ -132,9 +132,6 @@ save  your script e.g. myloader.lua and run...
 ...
 ~~~
 
-### Creating dataset from database tables
-
-
 ## Api documentation
 
 ***DataTree class***
