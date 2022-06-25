@@ -68,6 +68,11 @@ local db_model = {
 	},
 }
 
+local startTime = os.clock()
 
 local ldr = require "toredis"
 ldr(db_model)
+
+local endTime = os.clock()
+io.stderr:write( endTime - startTime )
+io.stderr:write( "seconds \n" )
