@@ -47,7 +47,7 @@ dtree-redis
 │   └── redis_client_cli.lua
 └── to-redis
     ├── bikestore_loader.lua
-    ├── data
+    ├── bikestore_data
     │   ├── # bikestore example files (json)
     └── toredis.lua
 ~~~
