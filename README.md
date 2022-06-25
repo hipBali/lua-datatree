@@ -99,6 +99,7 @@ $ curl -X POST -H "Content-Type: application/json" \
 -d '{"customer_id":123, "staff_id":1}' \
 localhost:8080/test/filter
 ~~~
+
 ## Preparing data for Redis <a name="prep_redis"></a>
 
 ### Creating dataset from json files
@@ -158,17 +159,20 @@ save  your script e.g. myloader.lua and run...
 
 ### Descriptors
 ***base***
-format : JSON
-access: GET/SET
-key: -
+
+- format : JSON
+- access: GET/SET
+- key: -
 ~~~
 {TABLE_NAME: RECORD_COUNT}
 ~~~
 
 ***desc***
-format : JSON
-access: GET/SET
-key: -
+
+- format : JSON
+- access: GET/SET
+- key: -
+
 ~~~
 {TABLE_NAME:{
 	"index":[
@@ -180,16 +184,17 @@ key: -
 ~~~ 
 
 ***record***
-format : JSON
-access: GET/SET
-key: TABLE_NAME:ROWID	
+- format : JSON
+- access: GET/SET
+- key: TABLE_NAME:ROWID	
 
 ***index***
-format : table of integers
-access: SADD/SMEMBERS
-key: TABLE_NAME:INDEX_NAME:INDEX_ROWID
+- format : table of integers
+- access: SADD/SMEMBERS
+- key: TABLE_NAME:INDEX_NAME:INDEX_ROWID
 
-## Api documentation <a name="req"></a>
+
+## Api documentation <a name="api_doc"></a>
 
 ***DataTree class***
 
