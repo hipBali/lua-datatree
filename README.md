@@ -1,6 +1,7 @@
 
 # lua-datatree-redis
-__Lua based dataset analyzer tool using redis storage__
+
+Lua based dataset analyzer tool using redis storage__
 
 
 # Table of Contents
@@ -38,6 +39,9 @@ for use from command line
 ~~~
 dtree-redis
 ├── cli
+│   ├── api
+│   │   └── core
+|   |       └── __copy_src__content_here__
 │   └── test
 |		├── tables.lua
 │       └── sum.lua
@@ -74,9 +78,9 @@ dtree-redis
 ~~~
 
 ## Usage <a name="usage"></a>
-### using as rest service
+### using rest service
 1. *install openresty*
-2. *create your own workspace*
+2. *create your own workspace and install lua-datatree-redis*
 ~~~
     mkdir ~/work 
     cd ~/work 
@@ -89,15 +93,38 @@ dtree-redis
 	nginx -p `pwd`/ -c conf/nginx.conf
 ~~~
 
-### using curl without parameters
+***simple curl request***
 ~~~
 $ curl localhost:8080/test/sum
 ~~~
-### using curl with parameters
+***curl request with parameters***
 ~~~
 $ curl -X POST -H "Content-Type: application/json" \
 -d '{"customer_id":123, "staff_id":1}' \
 localhost:8080/test/filter
+~~~
+
+### using command line interface
+1. *create your own workspace and install lua-datatree-redis*
+~~~
+	mkdir ~/work 
+    cd ~/work 
+	git clone https://github.com/hipBali/lua-datatree-redis.git
+	cd dtree-redis
+	cp src/* cli/api/core
+~~~
+
+2. *create your own workspace*
+~~~
+    cd ~/work/dtree-redis/cli 
+	mkdir ~/mytest
+    cd ~/mytest 
+~~~
+ 3. *put your scripts in to the workspace considering the **package.path** variable*
+~~~
+	package.path = "../?.lua;" .. package.path
+	local redc = require "api.core.redis_client_cli"
+	...
 ~~~
 
 ## Preparing data for Redis <a name="prep_redis"></a>
@@ -194,7 +221,7 @@ save  your script e.g. myloader.lua and run...
 - key: TABLE_NAME:INDEX_NAME:INDEX_ROWID
 
 
-## Api documentation <a name="api_doc"></a>
+## Api documentation <a name="req"></a>
 
 ***DataTree class***
 
@@ -437,4 +464,36 @@ requestHandler = function()
 end 
 ~~~
 
-### Preapre your query
+### Get POST params
+curl command
+~~~
+curl \
+-X POST \
+-H "Content-Type: application/json" \
+-d '{"customer_id":123, "staff_id":1}' \
+...
+~~~
+lua script will get the parameters as lua table
+~~~
+requestHandler = function(par)
+	print(par.customer_id)
+	print(par.staff_id)
+	...
+~~~
+
+### Get POST params
+curl command
+~~~
+curl \
+-X POST \
+-H "Content-Type: application/json" \
+-d '{"customer_id":123, "staff_id":1}' \
+...
+~~~
+lua script will get the parameters as lua table
+~~~
+requestHandler = function(par)
+	print(par.customer_id)
+	print(par.staff_id)
+	...
+~~~
