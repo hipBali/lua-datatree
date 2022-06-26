@@ -627,7 +627,7 @@ Table PRODUCTS and BRANDS 1:1 related via brand_id and in this case the result w
 ~~~
 
 ### change join target
-The join method tries to join to the last node of the dataset chain. With the 'on' parameter you can change the default target node to another one.   
+The join method tries to join to the first node of the dataset chain. With the 'on' parameter you can change the default target node to another one.   
 ~~~
 ds:select{object="PRODUCTS"}	
 :join{object="BRANDS", merge=true}
