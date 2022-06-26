@@ -89,7 +89,7 @@ dtree-redis
    mkdir ~/work 
    cd ~/work 
    git clone https://github.com/hipBali/lua-datatree-redis.git
-   cd dtree-redis
+   cd lua-datatree-redis
    cp src/* resty/api/core
 ~~~
  3. *run Nginx rest service*
@@ -114,7 +114,7 @@ localhost:8080/test/filter
    mkdir ~/work 
    cd ~/work 
    git clone https://github.com/hipBali/lua-datatree-redis.git
-   cd dtree-redis
+   cd lua-datatree-redis
    cp src/* cli/api/core
 ~~~
 
