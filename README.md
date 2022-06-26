@@ -174,7 +174,8 @@ save  your script e.g. myloader.lua and run...
 
 		
 **Loading dataset from different json structure**
-						r_loadModel(dataset_descriptor,**path_to_dataset**)
+
+r_loadModel(dataset_descriptor,**path_to_dataset**)
 		
 *this loader tries to find records at the 'rows' node, so you can change the path with changing this parameter*
 ~~~
