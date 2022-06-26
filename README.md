@@ -305,21 +305,27 @@ name of the targeted object in the dataset chain, default is the main dataset
 ~~~
 - as:
 alias for object
+
 - index:
 name of required index, default is "pk"
+
 - filter:
+
 -- table of key-value pairs or function
 or
 -- function with boolean return value
 
 - fields:
 list of fields included in each record, default is all
+
 - limit:
 maximum size of result dataset
+
 - merge:
 -- boolean parameter, on true the engine will merge the joined object properties with targeted object if the relation of object is 1:1
 or
 -- function(target, source)  the engine calls the given function to manage 1:n relation merge
+
 - call:
 function(target,source) the engine calls the given function
 
