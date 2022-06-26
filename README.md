@@ -99,7 +99,7 @@ dtree-redis
 ~~~
    nginx -p `pwd`/ -c conf/nginx.conf
 ~~~
- 4. *create your script*
+ 4. *create and execute your script*
 ~~~
    mkdir scripts/myscripts
    nano scripts/myscripts/rest_test.lua
@@ -131,14 +131,20 @@ localhost:8080/test/filter
 2. *create your own workspace*
 ~~~
    cd ~/work/dtree-redis/cli 
-   mkdir ~/mytest
-   cd ~/mytest 
+   mkdir mytest
+   cd mytest 
 ~~~
- 3. *put your scripts in to the workspace considering the **package.path** variable*
+ 3. *create your script*
 ~~~
-package.path = "../?.lua;" .. package.path
-local redc = require "api.core.redis_client_cli"
-...
+   nano cli_test.lua
+~~~
+set the **package.path** variable correctly pointing to ~/work/dtree-redis/cli
+~~~
+   package.path = "../?.lua;" .. package.path
+~~~
+ 4. *run the script*
+~~~
+lua cli_test.lua
 ~~~
 
 ### install example database
