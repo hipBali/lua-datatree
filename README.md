@@ -322,6 +322,7 @@ list of fields included in each record, default is all
 maximum size of result dataset
 
 - merge:
+- 
 -- boolean parameter, on true the engine will merge the joined object properties with targeted object if the relation of object is 1:1
 or
 -- function(target, source)  the engine calls the given function to manage 1:n relation merge
