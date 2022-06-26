@@ -373,7 +373,8 @@ ds:select{object="PRODUCTS"}
 
 **sort{ }**
 Calls a sort function on any element of the dataset chain
-	*parameters:*
+
+*parameters:*
 - on: 
 name of the targeted object in the dataset chain which is will be sorted
 - call:
@@ -386,21 +387,27 @@ ds:select{object="ORDERS", fields={"order_id","customer_id","order_date"}}
 ~~~
 
 **tc_select{ }**
+
 Same as ___select___ method, but the result will be automatically converted to ___collection___ class. This is the final result of the select ommand only DataCollection methods or lua table functions can be used for further manipulations!
 
 **tc_join{ }**
+
 Same as ___join___ method, but the result will be automatically converted to ___collection___ class. This is the final result of the select-join command chain only DataCollection methods or lua table functions can be used for further manipulations!
 
 ---
 The datatree object contains raw data including some non relevant informatons beyond what is expected. The following methods will cleanup the result.
 **content( )**
+
 Returns datatree content as simple lua table
+
 **toCollection( )**  or **tc( )**
+
 Returns  datatree content as ___collection class___.  
 
 ---
 
 ***Collection class***
+
 DataCollection is the 'pure data only' part of the DataTree with some useful functions. 
 
 *creating data collection*
@@ -412,6 +419,7 @@ local function fn_stock_calc(stocks)
 ~~~
 
 **map( key )**
+
 collects elements in to a map by given key
 ~~~
 local function fn_stock_calc(stocks)
@@ -445,6 +453,7 @@ the result should looks like this
 ~~~
 
 **each( function )** and **eachi( function )**
+
 iterator function for the collection
 
 the
@@ -454,18 +463,23 @@ the
 **avg( key )**
 **count( )**
 **median( key )**
+
 are aggregate functions
 
 **range( vMin, vMax, key )**
+
 returns a part of the collection in given range
 
 **anyOf( values, key )**
+
 returns a part of the collection which are belongs to the set of values
 
 **noneOf( value, key )**
+
 returns a part of the collection which are out of the set of values
 
 **clone( )**
+
 makes a new individual object from the original 
 
 ---
