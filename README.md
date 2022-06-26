@@ -257,6 +257,7 @@ Datatree is a complete representation of the datas loaded into the memory as set
 The following methods available to manipulate your dataset.
 
 **select{ }**
+
 Result is the base dataset for further manipulating.
 	*parameters:*
 - object: 
@@ -297,6 +298,7 @@ ds:select{object="PRODUCTS", call=function(o) ... end }
 ~~~
 
 **join{ }**
+
 Adds related object(s) to your targeted object
 	*parameters:*
 - on: 
@@ -343,6 +345,7 @@ ds:select{object="PRODUCTS"}
 ~~~
 
 **select_ix{ }**
+
 Performs a quick subselection from given index reference by given item identifier
 	*parameters:*
 - object: 
@@ -381,6 +384,7 @@ ds:select{object="PRODUCTS", call =
 ~~~
 
 **func{ }** or **fn{ }**
+
 Calls a function on any element of the dataset chain
 	*parameters:*
 - on: 
@@ -399,6 +403,7 @@ ds:select{object="PRODUCTS"}
 ~~~
 
 **sort{ }**
+
 Calls a sort function on any element of the dataset chain
 
 *parameters:*
