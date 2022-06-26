@@ -9,7 +9,7 @@ local red = redc.connect()
 local dt = dt_red.new('BIKESTORE',red)
 local result = dt:tc_select{object="PRODUCTS", fields={"product_id", "product_name"}, call = 
 	function(o)
-		local ss = ds:select_ix{object="STOCKS", index="idx_product_id", item=o.product_id}
+		local ss = dt:select_ix{object="STOCKS", index="idx_product_id", item=o.product_id}
 		o.on_stock = dtc.new(ss):sum("quantity")
 		if o.on_stock==0 then
 			return nil
