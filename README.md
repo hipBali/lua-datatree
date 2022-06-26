@@ -91,6 +91,8 @@ dtree-redis
    git clone https://github.com/hipBali/lua-datatree-redis.git
    cd lua-datatree-redis
    cp src/* resty/api/core
+   cd resty
+   mkdir logs
 ~~~
  3. *run Nginx rest service*
 ~~~
