@@ -51,6 +51,9 @@ DataTree = {}
 	function DataTree:select(prm)
 		assert(prm.object,string.format("select(): invalid object!"))
 		assert(self._base[prm.object],string.format("select(): object %s does not exists!",prm.object))
+		-- descriptor for the object
+		local dsc = self._desc[prm.object]
+		assert(dsc,string.format("select(): descriptor missing for %s!",prm.object))
 		-- make an own datatree for the select
 		-- #REDIS#
 		local result = DataTree:new(prm.object,self._rc)
@@ -62,10 +65,6 @@ DataTree = {}
 		dbc.proxy(resdata[alias])
 		
 		result._name = alias
-		
-		-- descriptor for the object
-		local dsc = self._desc[prm.object]
-		assert(dsc,string.format("select(): descriptor missing for %s!",prm.object))
 				
 		local function processObject(o)
 			o = dbc.clone(o)
@@ -107,7 +106,7 @@ DataTree = {}
 		
 		-- #REDIS#
 		if prm.index and prm.index ~= "pk" then
-			local ixn = dbu_red.findIndex(dsc.index, prm.index)
+			local ixn = dbu_red.findIndex(dsc, prm.index)
 			assert(ixn,string.format("select(): %s:%s invalid index!",prm.object,prm.index))
 			
 			local size = self._base[prm.object]
@@ -118,7 +117,7 @@ DataTree = {}
 				for _,ptr in pairs(it) do
 					prc = processObject(dbu_red.r_getObject(self._rc,prm.object, ptr))
 				end
-				-- apply limit parameter
+				-- apply limit parameter 
 				if prc then
 					n = n + 1
 					if prm.limit and n == prm.limit then break end
@@ -137,6 +136,75 @@ DataTree = {}
 		end
 		-- 
 		return result, alias
+	end
+	
+	function DataTree:select_ix(prm)
+		assert(prm.object,string.format("select_ix(): invalid object!"))
+		assert(self._base[prm.object],string.format("select(): object %s does not exists!",prm.object))
+		prm.index = prm.index or "pk"
+		assert(prm.item,string.format("select_ix(): item missing!"))
+		assert(type(prm.item)=="number",string.format("select_ix(): item must be a number!"))
+		local dsc = self._desc[prm.object]
+		assert(dsc,string.format("select()_ix: descriptor missing for %s!",prm.object))
+		-- make an own datatree for the select
+		-- #REDIS#
+		local result = DataTree:new(prm.object,self._rc)
+		local resdata = result._data
+		
+		-- detects alias, and uses as default target
+		local alias = prm.object 
+		resdata[alias] = resdata[alias] or {}
+		dbc.proxy(resdata[alias])
+		
+		result._name = alias
+				
+		local function processObject(o)
+			o = dbc.clone(o)
+			local fit = true
+			-- apply filter
+			if type(prm.filter)=="function" then
+				fit = prm.filter(o)
+			elseif type(prm.filter)=="table" then
+				for k,v in pairs(prm.filter) do
+					if o[k]~=v then 
+						fit = false
+						break
+					end
+				end
+			end
+			-- fields to select
+			if type(prm.fields)=="table" then
+				for k,_ in pairs(o) do
+					if dbc.noneOf(prm.fields,k) then
+						o[k] = nil
+					end
+				end
+			end
+			-- add object to the tree 
+			if fit then 
+				-- postprocessing 
+				if type(prm.call)=="function" then
+					o = prm.call(o)
+				end
+				table.insert(resdata[alias],o)
+			end
+		end
+				
+		-- find by index 
+		local ixn = dbu_red.findIndex(dsc, prm.index)
+		assert(ixn,string.format("select()_ix: %s:%s invalid index!",prm.object,prm.index))
+		
+		local n = 0
+		local it = dbu_red.r_getObjectsByIndex(self._rc,prm.object,ixn.name,prm.item)
+		if it then
+			for _,ptr in pairs(it) do
+				processObject(dbu_red.r_getObject(self._rc,prm.object, ptr))
+				n = n + 1
+				if prm.limit and n == prm.limit then break end
+			end
+		end
+		-- 
+		return resdata[alias]
 	end
 	
 	function DataTree:join(prm)
@@ -161,7 +229,7 @@ DataTree = {}
 			trgName = self._name
 		end
 		
-		local joinIdx = dbu_red.findIndex(dsc.index, prm.index or "pk")
+		local joinIdx = dbu_red.findIndex(dsc, prm.index or "pk")
 		assert(joinIdx,string.format("join(): index %s not found ( %s on %s)!", prm.index or "pk", tostring(prm.object), trgName))
 		
 		local alias = prm.as or prm.object 
@@ -240,10 +308,11 @@ DataTree = {}
 				end
 				
 				-- puts result in to the chain
+				
 				if res then
 					res = dbc.clone(res)
-					if type(prm.call)=="function" then
-						prm.merge = prm.call
+					if prm.call and type(prm.call)=="function" then
+						prm.call(res,obj)
 					end
 					if prm.merge and #res == 1 then
 						if type(prm.merge)=="function" then
@@ -307,10 +376,34 @@ DataTree = {}
 		return self
 	end
 	
+	function DataTree:func(prm)
+		local root = self._data
+		local alias = prm.on or self._name
+		local t = root[alias]
+		if alias ~= self.name then
+			t = self:getChilds(alias)
+		end
+		local tc = DataCollection.new(t)
+		-- named function
+		local fn
+		-- or function as parameter
+		if type(prm[1]) == "function" then
+			fn = prm[1]
+		else
+			fn = prm.call
+		end		
+		fn(tc, self._data)
+		return self
+	end
+	
 	function DataTree:sort(prm)
 		local root = self._data
 		local alias = prm.on or self._name
-		local tc = DataCollection.new(root[alias])
+		local t = root[alias]
+		if alias ~= self.name then
+			t = self:getChilds(alias)
+		end
+		local tc = DataCollection.new(t)
 		-- named function
 		local fn
 		-- or function as parameter
@@ -320,22 +413,6 @@ DataTree = {}
 			fn = prm.call
 		end		
 		table.sort(tc, fn)
-		return self
-	end
-	
-	function DataTree:func(prm)
-		local root = self._data
-		local alias = prm.on or self._name
-		local tc = DataCollection.new(root[alias])
-		-- named function
-		local fn
-		-- or function as parameter
-		if type(prm[1]) == "function" then
-			fn = prm[1]
-		else
-			fn = prm.call
-		end		
-		fn(tc)
 		return self
 	end
 	
