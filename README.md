@@ -99,6 +99,13 @@ dtree-redis
 ~~~
    nginx -p `pwd`/ -c conf/nginx.conf
 ~~~
+ 4. *create your script*
+~~~
+   mkdir scripts/myscripts
+   nano scripts/myscripts/rest_test.lua
+   ...
+   curl localhost:8080/myscripts/rest_test
+~~~
 
 ***simple curl request***
 ~~~
