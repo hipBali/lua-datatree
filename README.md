@@ -47,7 +47,8 @@ dtree-redis
 │   │   └── core
 |   |       └── __copy_src__content_here__
 │   └── test
-|		├── tables.lua
+|	├── indexes.lua
+|	├── tables.lua
 │       └── sum.lua
 ├── readme.md
 ├── resty
