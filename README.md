@@ -249,7 +249,7 @@ r_loadModel(dataset_descriptor,**path_to_dataset**)
 - key: TABLE_NAME:INDEX_NAME:INDEX_ROWID
 
 
-## Api documentation <a name="req"></a>
+## Api documentation <a name="api_doc"></a>
 
 ***DataTree class***
 
@@ -311,9 +311,11 @@ name of required index, default is "pk"
 
 - filter:
 
--- table of key-value pairs or function
-or
--- function with boolean return value
+	- table of key-value pairs or function
+	
+	or
+	
+	- function with boolean return value
 
 - fields:
 list of fields included in each record, default is all
@@ -322,10 +324,12 @@ list of fields included in each record, default is all
 maximum size of result dataset
 
 - merge:
-- 
--- boolean parameter, on true the engine will merge the joined object properties with targeted object if the relation of object is 1:1
-or
--- function(target, source)  the engine calls the given function to manage 1:n relation merge
+
+	- boolean parameter, on true the engine will merge the joined object properties with targeted object if the relation of object is 1:1
+
+	or
+
+	- function(target, source)  the engine calls the given function to manage 1:n relation merge
 
 - call:
 function(target,source) the engine calls the given function
