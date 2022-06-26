@@ -21,6 +21,8 @@ Lua based dataset analyzer tool using redis storage
 
 [How-to](#howto)
 
+[Programming by examples](#prog)
+
 
 
 ## Requirements  <a name="req"></a>
@@ -129,6 +131,13 @@ local redc = require "api.core.redis_client_cli"
 ...
 ~~~
 
+### install example database
+~~~
+   cd ~/work/dtree-redis/to-redis 
+   lua bikestore_loader.lua
+   cd ..
+~~~
+
 ## Preparing data for Redis <a name="prep_redis"></a>
 
 ### Creating dataset from json files
@@ -235,6 +244,8 @@ Result is the base dataset for further manipulating.
 	*parameters:*
 - object: 
 name of the json object to select as main element of your query
+~~~
+~~~
 - as:
 alias for object
 - index:
@@ -246,7 +257,7 @@ list of fields included in each record, default is all
 - limit:
 maximum size of result dataset
 - call:
-user defined function wich is called on each records in result dataset
+user defined function wich is called on each records in result dataset and returns the final version of the object
 
 *examples*:
 
@@ -266,14 +277,6 @@ ds:select{object="PRODUCTS", fields={"product_id","product_name"}}
 
 -- process each objects
 ds:select{object="PRODUCTS", call=function(o) ... end }
-
--- indexed 'subselect', calculates stocks available for each products
-ds:select{object="PRODUCTS", fields={"product_id", "product_name"}, 
-			call = function(o)
-					local ss = ds:select{object="STOCKS", index="idx_product_id", filter={product_id=o.product_id}}:toCollection()
-					o.on_stock = dtc.new(ss.STOCKS):sum("quantity")
-					return o
-			end}
 ~~~
 
 **join{ }**
@@ -281,6 +284,8 @@ Adds related object(s) to your targeted object
 	*parameters:*
 - on: 
 name of the targeted object in the dataset chain, default is the main dataset
+~~~
+~~~
 - as:
 alias for object
 - index:
@@ -307,6 +312,44 @@ function(target,source) the engine calls the given function
 ds:select{object="PRODUCTS"}
 	:join{object="STOCKS",index="idx_product_id"}
 	:join{object="STORES", on="STOCKS", merge=true}
+~~~
+
+**select_ix{ }**
+Performs a quick subselection from given index reference by given item identifier
+	*parameters:*
+- object: 
+name of the json object to select as main element of your query
+- item
+table of unique id's   
+~~~
+~~~
+- index:
+name of required index, default is "pk"
+- filter:
+table of key-value pairs or function
+- fields:
+list of fields included in each record, default is all
+- limit:
+maximum size of result dataset
+- call:
+user defined function wich is called on each records in result dataset
+
+*example*:
+~~~
+-- select all products having available stock
+
+ds:select{object="PRODUCTS", call = 
+	function(product)
+		local ss = ds:select_ix{
+			object="STOCKS", 
+			index="idx_product_id", 
+			item=product.product_id
+		}:toCollection()
+		if ss:sum("quantity")==0 then
+			return nil
+		end
+		return product
+	end
 ~~~
 
 **func{ }** or **fn{ }**
@@ -357,7 +400,7 @@ Returns  datatree content as ___collection class___.
 ---
 
 ***Collection class***
-DataCollection is the 'pure data only' part of the DataTree.
+DataCollection is the 'pure data only' part of the DataTree with some useful functions. 
 
 *creating data collection*
 ~~~
@@ -572,6 +615,39 @@ The join method tries to join to the last node of the dataset chain. With the 'o
 ds:select{object="PRODUCTS"}	
 :join{object="BRANDS", merge=true}
 :join{object="CATEGORIES", on="PRODUCTS", merge=true}
+~~~
+
+### post processing result dataset
+ To finalize your result dataset you can use the 'func' method. Any objects at the result tree structure can be accessed with this function and.
+~~~
+ds:select{object="CUSTOMERS"}
+:join{object="ORDERS", index="idx_customer_id"}
+:join{object="ORDER_ITEMS", on="ORDERS", index="idx_order_id"}
+:func{ on="ORDERS", call=calc_total }
+:func{ call=finalize }
+~~~
+The function 'calc_total' will recive the parameter:
+- ORDERS as DataCollection
+~~~
+	ORDERS [DataCollection]
+	├── order 1
+	│   └── ORDER_ITEMS [table]
+	|       ├── order item 1
+	│       └── order item n
+	└── order n
+	    └── ORDER_ITEMS [table]
+	        ├── order item 1
+	        └── order item n
+~~~
+
+The function 'finalize ' will recive the root object of the tree as parameter:
+- CUSTOMERS as DataCollection 
+ 
+ ### using alias parameter
+The join method tries to join to the last node of the dataset chain. With the 'on' parameter you can change the default target node to another one.   
+~~~
+ds:select{object="PRODUCTS", as="BIKES"}	
+:join{object="CATEGORIES", on="BIKES"}
 ~~~
 
 ## License
