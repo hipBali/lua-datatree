@@ -52,7 +52,6 @@ function r_loadModel(dbt_model,tagId)
 	local base = {}
 	for _,dt in pairs(dbt_model) do
 		local t =  json.load( dt.filename )
-		json.save( t.rows, string.lower(dt.filename) )
 		dt.filename = nil
 		if tagId then t = t[tagId] end
 		dt.size = r_loadObjects(t,dt)
