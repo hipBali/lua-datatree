@@ -37,11 +37,11 @@ for use as rest service
 for use from command line
 >**redis-lua**
 >[nrk/redis-lua](https://github.com/nrk/redis-lua)
->
+
 
 ## Directory structure <a name="dir_struct"></a>
 ~~~
-dtree-redis
+lua-datatree-redis
 ├── cli
 │   ├── api
 │   │   └── core
@@ -66,20 +66,15 @@ dtree-redis
 │           ├── report.lua
 │           ├── sort.lua
 │           └── sum.lua
-├── src
-│   ├── dtcoll.lua
-│   ├── dtcommon.lua
-│   ├── dtree_redis.lua
-│   ├── dtutil_redis.lua
-│   ├── hlpfunc.lua
-│   ├── json.lua
-│   ├── redis_client.lua
-│   └── redis_client_cli.lua
-└── to-redis
-    ├── bikestore_data
-    │   └── # bikestore example files (json)
-    ├── bikestore_loader.lua
-    └── toredis.lua
+└── src
+    ├── dtcoll.lua
+    ├── dtcommon.lua
+    ├── dtree_redis.lua
+    ├── dtutil_redis.lua
+    ├── hlpfunc.lua
+    ├── json.lua
+    ├── redis_client.lua
+    └── redis_client_cli.lua
 ~~~
 
 ## Usage <a name="usage"></a>
@@ -148,11 +143,10 @@ lua cli_test.lua
 ~~~
 
 ### install example database
-~~~
-   cd ~/work/dtree-redis/to-redis 
-   lua bikestore_loader.lua
-   cd ..
-~~~
+
+You will need
+>**lua-pump-redis**
+>[hipBali/lua-pump-redis](https://github.com/hipBali/lua-pump-redis)
 
 ## Preparing data for Redis <a name="prep_redis"></a>
 
