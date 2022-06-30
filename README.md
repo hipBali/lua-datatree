@@ -15,8 +15,6 @@ Lua based dataset analyzer tool using redis storage
 
 [Usage](#usage)
 
-[Preparing data for Redis](#prep_redis)
-
 [Redis Datatree structure](#red_struct)
 
 [How-to](#howto)
