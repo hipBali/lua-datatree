@@ -146,62 +146,6 @@ You will need
 >**lua-pump-redis**
 >[hipBali/lua-pump-redis](https://github.com/hipBali/lua-pump-redis)
 
-## Preparing data for Redis <a name="prep_redis"></a>
-
-### Creating dataset from json files
-**create dataloader**
-		The dataloader should define detailed structure of the json file(s).
-		
-~~~
-local dataPath = "mydata/bikestore/"
-
-local db_model = {
-  { name = "CUSTOMERS", 
-	filename = dataPath.."customers.json", 
-	index = {
-	  { name = "pk", segments = {"customer_id"} },
-	  { name = "idx_name", segments = {"last_name", "last_name"}, unique = false },
-		...
-	},
-  },
-  ...
-}
-~~~
-use toredis.lua utility to put dataset to Redis
-~~~
-local db_model = {
-	...
-}
-local ldr = require "toredis"
-ldr(db_model)
-~~~
-save  your script e.g. myloader.lua and run...
-~~~
-	$ lua myloader.lua
-~~~
-
-		
-**Loading dataset from different json structure**
-
-r_loadModel(dataset_descriptor,**path_to_dataset**)
-		
-*this loader tries to find records at the 'rows' node, so you can change the path with changing this parameter*
-~~~
-{
-"table": "products",
-"rows":
-[
-	{
-		"product_id": 1,
-		"product_name": "Trek 820 - 2016",
-		"brand_id": 9,
-		"category_id": 6,
-		"model_year": 2016,
-		"list_price": 379.99
-	},
-...
-~~~
-
 ## Redis Datatree structure <a name="red_struct"></a>
 
 ### Descriptors
