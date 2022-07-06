@@ -210,6 +210,8 @@ table of key-value pairs or function
 list of fields included in each record, default is all
 - limit:
 maximum size of result dataset
+- range:
+table of the first and the last index in processing range
 - call:
 user defined function wich is called on each records in result dataset and returns the final version of the object
 
