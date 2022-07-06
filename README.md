@@ -1,6 +1,3 @@
-
-
-
 # lua-datatree-redis
 
 Lua based dataset analyzer tool using redis storage
