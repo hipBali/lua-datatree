@@ -103,14 +103,18 @@ DataTree = {}
 				
 		local n = 0
 		-- find index for the joining object
-		
+		local start = 1
+		local size = self._base[prm.object]
+		if prm.range and type(prm.range)=="table" then
+			start = prm.range[1] or 1
+			size = prm.range[2] or size
+		end
 		-- #REDIS#
 		if prm.index and prm.index ~= "pk" then
 			local ixn = dbu_red.findIndex(dsc, prm.index)
 			assert(ixn,string.format("select(): %s:%s invalid index!",prm.object,prm.index))
 			
-			local size = self._base[prm.object]
-			for i=1,size do
+			for i=start,size do
 				local it = dbu_red.r_getObjectsByIndex(self._rc,prm.object,ixn.name,i)
 				if it == nil then break end
 				local prc
@@ -124,8 +128,8 @@ DataTree = {}
 				end
 			end
 		else
-			local size = self._base[prm.object]
-			for i=1,size do 
+
+			for i=start,size do 
 				local prc = processObject(dbu_red.r_getObject(self._rc,prm.object, i))
 				-- apply limit parameter
 				if prc then
