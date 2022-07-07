@@ -18,6 +18,8 @@ Lua based dataset analyzer tool using redis storage
 
 [Programming by examples](#prog)
 
+[Wiki examples](https://github.com/hipBali/lua-datatree-redis/wiki)
+
 
 
 ## Requirements  <a name="req"></a>
