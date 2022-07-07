@@ -202,6 +202,28 @@ function m.proxy (t)
 	return _t
 end
 
+function m.exclude(t,keys)
+  for _,k in pairs(keys) do
+	if t[k] then
+		t[k] = nil
+	end
+  end
+end
+
+function m.include(t,keys)
+  local kt = {}
+  for _,v in pairs(keys) do
+	kt[v] = v
+  end
+  for k,_ in pairs(t) do
+	  for _,key in pairs(keys) do
+		if not kt[k] then
+			t[k] = nil
+		end
+	  end
+  end
+end
+
 function m.each(t,f)
   for index,value in pairs(t) do
 	if type(value)~="function" then
