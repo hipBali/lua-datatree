@@ -233,8 +233,17 @@ DataTree = {}
 			trgName = self._name
 		end
 		
-		local joinIdx = dbu_red.findIndex(dsc, prm.index or "pk")
-		assert(joinIdx,string.format("join(): index %s not found ( %s on %s)!", prm.index or "pk", tostring(prm.object), trgName))
+		local joinIdx
+		-- link no index --
+		local isLink
+		if prm.link then
+			assert(type(prm.link)=="string",string.format("join(): wrong link parameter!"))
+			isLink = true
+			prm.merge = true
+		else
+			joinIdx = dbu_red.findIndex(dsc, prm.index or "pk")
+			assert(joinIdx,string.format("join(): index %s not found ( %s on %s)!", prm.index or "pk", tostring(prm.object), trgName))
+		end
 		
 		local alias = prm.as or prm.object 
 		
@@ -242,11 +251,19 @@ DataTree = {}
 		----------------------------------------------------------------------------------------
 		local size = self._base[prm.object]
 		for _,obj in pairs(root) do 
-			local res = dbu_red.r_getObjectsByIndex(self._rc,prm.object,joinIdx.name,dbu_red.toIndex(obj,joinIdx))
+			local res = {}
+			if isLink then
+				assert(obj[prm.link],string.format("join(): link %s not found at %s!", prm.link, tostring(prm.object)))
+				res = dbu_red.r_getObject(self._rc,prm.object, obj[prm.link])
+			else
+				res = dbu_red.r_getObjectsByIndex(self._rc,prm.object,joinIdx.name,dbu_red.toIndex(obj,joinIdx))
+			end
 			if res and type(res)=="table" then
 				-- index to object
-				for k,v in pairs(res) do
-					res[k] = dbu_red.r_getObject(self._rc,prm.object, v)
+				if not isLink then
+					for k,v in pairs(res) do
+						res[k] = dbu_red.r_getObject(self._rc,prm.object, v)
+					end
 				end
 				-- apply filter if any
 				if type(prm.filter)=="function" then
@@ -311,10 +328,15 @@ DataTree = {}
 					res = t
 				end
 				
+				-- convert linked object to table
+				if prm.link then
+					local t = {}
+					t[1] = res
+					res = t
+				end
 				-- puts result in to the chain
-				
 				if res then
-					res = dbc.clone(res)
+					-- res = dbc.clone(res)
 					if prm.call and type(prm.call)=="function" then
 						prm.call(res,obj)
 					end
@@ -331,7 +353,7 @@ DataTree = {}
 							end
 						end
 					else
-						obj[alias] = obj[alias]
+						-- obj[alias] = obj[alias]
 						obj[alias] = res
 						dbc.proxy(obj[alias])
 					end

@@ -14,11 +14,13 @@ end
 
 function m.r_getObject(client,t_name, idx)
 	local res, err = client:get(string.format("%s:%d",t_name,idx))
+	assert(res,string.format("%s:%d\n",t_name,idx))
 	return json.decode(res)
 end
 
 function m.r_getObjectsByIndex(client,t_name,i_name,k_name)
 	local res, err = client:smembers(string.format("%s:%s:%s",t_name,i_name,k_name))
+	assert(res,string.format("%s:%s:%s",t_name,i_name,k_name))
 	return res
 end
 
